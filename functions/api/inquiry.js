@@ -1,5 +1,13 @@
 // Cloudflare Pages Function. Secrets belong in Cloudflare, never in browser code.
+export function normalizeEnv(env) {
+  const result = {...env};
+  for (const key of ['INQUIRY_ENABLED', 'RESEND_API_KEY', 'INQUIRY_FROM', 'SITE_ORIGIN', 'TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY', 'PRIVACY_NOTICE']) {
+    if (typeof result[key] === 'string') result[key] = result[key].trim();
+  }
+  return result;
+}
 export function configured(env) {
+  env = normalizeEnv(env);
   return env.INQUIRY_ENABLED === 'true' &&
     ['RESEND_API_KEY', 'INQUIRY_FROM', 'SITE_ORIGIN', 'TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY', 'PRIVACY_NOTICE']
       .every(key => typeof env[key] === 'string' && env[key].trim());
@@ -10,6 +18,7 @@ function json(data, status = 200) {
 const materials = ['프로파일', '플라스틱 (아크릴·수지류)', '아크릴', '기타 수지류', '상담 후 결정'];
 const labels = {name: '회사명 / 성함', contact: '연락처', material: '문의 소재', quantity: '예상 수량', message: '문의 내용'};
 export async function onRequest({request, env}, fetcher = fetch) {
+  env = normalizeEnv(env);
   if (request.method !== 'POST') return json({error: '허용되지 않은 요청입니다.'}, 405);
   if (!configured(env)) return json({error: '온라인 접수 준비 중입니다. GTS@gtskorea.co.kr로 문의해 주세요.'}, 503);
   if (request.headers.get('Origin') !== env.SITE_ORIGIN || new URL(request.url).origin !== env.SITE_ORIGIN) {

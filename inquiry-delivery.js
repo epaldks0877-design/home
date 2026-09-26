@@ -7,7 +7,8 @@
     if (!response.ok) return;
     config = await response.json();
   } catch { return; }
-  if (!config.enabled || !config.siteKey || !config.privacyNotice) return;
+  if (!config.enabled || typeof config.siteKey !== 'string' || !config.privacyNotice) return;
+  config.siteKey = config.siteKey.trim();
   const form = document.querySelector('#inquiry-form');
   const dialog = document.querySelector('#preview-dialog');
   const note = dialog.querySelector('.dialog-note');
@@ -25,15 +26,12 @@
   disclosure.append(summary, privacy);
   form.querySelector('.submit').before(disclosure, consent);
   form.querySelector('.form-hint').textContent = '* 필수 항목 · 문의 내용을 확인한 뒤 접수할 수 있습니다.';
-  const panel = document.createElement('div');
-  panel.className = 'inquiry-delivery';
+  const panel = document.querySelector('#inquiry-security');
+  panel.hidden = false;
   const challenge = document.createElement('div');
-  const status = document.createElement('p');
-  status.className = 'inquiry-status'; status.setAttribute('role', 'status');
-  const send = document.createElement('button');
-  send.type = 'button'; send.className = 'button lime'; send.textContent = '견적 문의 접수'; send.disabled = true;
-  panel.append(challenge, send, status);
-  dialog.append(panel);
+  const status = document.querySelector('#inquiry-status');
+  const send = document.querySelector('#send-inquiry');
+  panel.append(challenge);
   let token = '', widget, snapshot, fingerprint = '', requestId, busy = false, accepted = false;
   let widgetReady = false;
   const load = new Promise((resolve, reject) => {
@@ -47,12 +45,18 @@
   });
   function mountChallenge() {
     if (!widgetReady || !dialog.open || widget !== undefined) return;
-    widget = window.turnstile.render(challenge, {
-      sitekey: config.siteKey, action: 'inquiry', theme: 'dark', size: 'flexible',
-      callback: value => { token = value; send.disabled = busy || accepted; },
-      'expired-callback': () => { token = ''; send.disabled = true; },
-      'error-callback': () => { token = ''; send.disabled = true; status.textContent = '보안 확인을 완료하지 못했습니다. 다시 시도해 주세요.'; },
-    });
+    status.textContent = '보안 확인을 진행 중입니다. 잠시 기다려 주세요.';
+    try {
+      widget = window.turnstile.render(challenge, {
+        sitekey: config.siteKey, action: 'inquiry', theme: 'dark', size: 'flexible',
+        callback: value => { token = value; send.disabled = busy || accepted; if (!busy && !accepted) status.textContent = '보안 확인이 완료되었습니다. 문의를 접수해 주세요.'; },
+        'expired-callback': () => { token = ''; send.disabled = true; if (!busy && !accepted) status.textContent = '보안 확인이 만료되었습니다. 다시 확인해 주세요.'; },
+        'error-callback': () => { token = ''; send.disabled = true; if (!busy && !accepted) status.textContent = '보안 확인을 완료하지 못했습니다. 새로고침 후 다시 시도하거나 GTS@gtskorea.co.kr로 문의해 주세요.'; },
+      });
+    } catch {
+      token = ''; send.disabled = true;
+      status.textContent = '보안 확인을 시작하지 못했습니다. 새로고침 후 다시 시도하거나 GTS@gtskorea.co.kr로 문의해 주세요.';
+    }
   }
   load.then(mountChallenge).catch(() => {});
   form.addEventListener('inquiry-preview', event => {

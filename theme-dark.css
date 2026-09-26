@@ -160,7 +160,7 @@ footer { background: #0c0d10; border-top: 1px solid #303237; padding-top: 46px; 
 dialog { background: #17191e; border: 1px solid #464b56; }
 dialog::backdrop { background: #030407c9; }
 .dialog-heading .eyebrow { color: #ff957b; }
-.dialog-note, dt, #download-status { color: #aeb5c3; }
+.dialog-note, dt { color: #aeb5c3; }
 .outline { color: #fff; border-color: #5b6270; }
 .outline:hover { background: #2a2e37; }
 .inquiry-consent { display: flex; align-items: center; gap: 9px; margin: 18px 0; }
@@ -168,9 +168,9 @@ dialog::backdrop { background: #030407c9; }
 .inquiry-privacy { color: #bcc3d0; font-size: 12px; line-height: 1.8; }
 .inquiry-privacy summary { cursor: pointer; }
 .inquiry-privacy p { margin-top: 10px; white-space: pre-wrap; }
-.inquiry-delivery { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
-.inquiry-delivery .button { width: 100%; justify-content: center; margin-top: 15px; }
+.inquiry-delivery { margin: 24px 0 20px; padding-top: 20px; border-top: 1px solid var(--line); }
 .inquiry-status { color: #c9cfd9; font-size: 12px; line-height: 1.8; margin-top: 14px; overflow-wrap: anywhere; }
+.inquiry-status:empty { display: none; }
 button:disabled { cursor: not-allowed; opacity: .55; }
 .skip-link { background: #c8401e; color: #fff; }
 @media(min-width:1600px) {

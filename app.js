@@ -50,7 +50,6 @@ document.querySelectorAll('[data-filter]').forEach(button => {
 const form = document.querySelector('#inquiry-form');
 const dialog = document.querySelector('#preview-dialog');
 const fieldNames = {name: '회사명 / 성함', contact: '연락처', material: '문의 소재', quantity: '예상 수량', message: '문의 내용'};
-let inquiryText = '';
 form.querySelectorAll('input[required], textarea[required]').forEach(input => {
   input.addEventListener('input', () => input.setCustomValidity(input.value.trim() ? '' : '내용을 입력해 주세요.'));
 });
@@ -59,7 +58,6 @@ form.addEventListener('submit', event => {
   const data = new FormData(form);
   const fields = document.querySelector('#preview-fields');
   fields.replaceChildren();
-  inquiryText = 'GTS KOREA 견적 문의 작성 내용\r\n※ 이 파일은 작성 내용 사본이며 접수 증빙이 아닙니다.\r\n\r\n';
   for (const [key, label] of Object.entries(fieldNames)) {
     const value = String(data.get(key) || '').trim() || '미정';
     const term = document.createElement('dt');
@@ -67,9 +65,7 @@ form.addEventListener('submit', event => {
     term.textContent = label;
     description.textContent = value;
     fields.append(term, description);
-    inquiryText += `${label}: ${value}\r\n\r\n`;
   }
-  document.querySelector('#download-status').textContent = '';
   dialog.showModal();
   form.dispatchEvent(new CustomEvent('inquiry-preview', {detail: Object.fromEntries(data)}));
 });
@@ -79,16 +75,5 @@ dialog.addEventListener('click', event => {
   if (dialog.dataset.sending === 'true') return;
   const rect = dialog.getBoundingClientRect();
   if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
-});
-document.querySelector('#download-inquiry').addEventListener('click', () => {
-  const url = URL.createObjectURL(new Blob(['\uFEFF', inquiryText], {type: 'text/plain;charset=utf-8'}));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'GTS-KOREA_견적문의_초안.txt';
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  document.querySelector('#download-status').textContent = '파일 저장을 요청했습니다. 브라우저 다운로드 목록을 확인해 주세요. 파일 저장만으로 문의가 접수되지는 않습니다.';
 });
 document.querySelector('#year').textContent = new Date().getFullYear();
