@@ -1,0 +1,11 @@
+.preview-browser/
+.qa/
+dist/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+.wrangler/
+node_modules/
+__pycache__/
+*.pyc
