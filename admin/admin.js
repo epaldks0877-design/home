@@ -35,9 +35,12 @@
         $('#connection-label').textContent = '화면 검토 모드';
         $('#connection-notice').textContent = '로컬 미리보기입니다. 등록 내용은 이 브라우저에만 저장되며 실제 홈페이지에는 반영되지 않습니다.';
       } else {
+        // An expired or rejected session must still offer a way to sign in again.
+        $('#logout').hidden = false;
+        $('#logout').textContent = '다시 로그인 ↗';
         const session = await api('session');
         $('#account-label').textContent = session.email;
-        $('#logout').hidden = false;
+        $('#logout').textContent = '로그아웃 ↗';
         $('#connection-label').textContent = '홈페이지 연결됨';
         $('.connection-dot').style.background = 'var(--green)';
         $('#connection-notice').hidden = true;
