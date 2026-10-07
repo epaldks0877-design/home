@@ -22,8 +22,9 @@ async function run(jwt, fetchKeys = async () => Response.json({keys: [jwk]})) {
   // Fresh certificate cache per case; no network request may leave this test.
   const {authorize} = await import(`../lib/admin-auth.js?test=${++caseNumber}`);
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async url => {
+  globalThis.fetch = async (url, init) => {
     assert.equal(url, 'https://auth-test.cloudflareaccess.com/cdn-cgi/access/certs');
+    assert.equal(init.redirect, 'manual');
     return fetchKeys();
   };
   try {
@@ -62,6 +63,13 @@ test('reports certificate outages as unavailable, not expired sessions', async (
   await rejected(jwt, 'CERTS', 503, async () => { throw new Error('offline'); });
   await rejected(jwt, 'CERTS', 503, async () => new Response('', {status: 503}));
   await rejected(jwt, 'CERTS', 503, async () => Response.json({keys: null}));
+});
+test('rejects redirected certificate responses without following another issuer', async () => {
+  const jwt = await token();
+  for (const status of [301, 302, 303, 307, 308]) {
+    await rejected(jwt, 'CERTS', 503, async () =>
+      new Response('', {status, headers: {Location: 'https://untrusted.example.test/keys'}}));
+  }
 });
 test('distinguishes unknown key and invalid signature', async () => {
   await rejected(await token({}, {kid: 'unknown'}), 'KEY');
