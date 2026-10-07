@@ -33,20 +33,6 @@ document.querySelectorAll('[data-service]').forEach(link => {
     document.querySelector('#material').value = link.dataset.service;
   });
 });
-document.querySelectorAll('[data-filter]').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter]').forEach(item => {
-      item.classList.toggle('active', item === button);
-      item.setAttribute('aria-pressed', String(item === button));
-    });
-    let count = 0;
-    document.querySelectorAll('[data-category]').forEach(card => {
-      card.hidden = button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter;
-      if (!card.hidden) count++;
-    });
-    document.querySelector('.filter-status').textContent = `${button.textContent} 분류: 등록 예정 항목 ${count}개`;
-  });
-});
 const form = document.querySelector('#inquiry-form');
 const dialog = document.querySelector('#preview-dialog');
 const fieldNames = {name: '회사명 / 성함', contact: '연락처', material: '문의 소재', quantity: '예상 수량', message: '문의 내용'};

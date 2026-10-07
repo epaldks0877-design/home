@@ -5,7 +5,8 @@ import shutil
 root = Path(__file__).resolve().parent
 target = root / 'dist'
 target.mkdir(exist_ok=True)
-files = ['index.html', 'styles.css', 'theme-dark.css', 'app.js', 'inquiry-delivery.js', '_headers', '_routes.json']
+files = ['index.html', 'styles.css', 'theme-dark.css', 'app.js', 'inquiry-delivery.js', 'catalog.js', 'catalog.css', '_headers', '_routes.json']
+files += ['admin/index.html', 'admin/admin.css', 'admin/admin.js']
 files += ['assets/' + name for name in ['favicon.svg', 'materials-studio.png', 'service-profile.png', 'service-plastic.png']]
 existing = {p.relative_to(target).as_posix() for p in target.rglob('*') if p.is_file()}
 unexpected = existing - set(files)

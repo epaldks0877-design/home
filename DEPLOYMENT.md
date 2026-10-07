@@ -1,10 +1,15 @@
 # 홈페이지 공개 및 견적 메일 연결
 
-## 현재 완료 / 미완료
+## 현재 상태
 
-Cloudflare Pages Functions + Resend 발송 API + Cloudflare Turnstile 방식의 코드가 준비되어 있습니다. 별도 서비스 가입·키 설정·발신 도메인 인증·공개 배포는 아직 하지 않았습니다. 기존 로고와 전화번호는 추후 추가 가능합니다. 사용자가 GTS@gtskorea.co.kr 수신 가능함을 확인했습니다.
+- Cloudflare Pages 프로젝트 `gts-korea1`에 배포했고 `https://gtskorea.co.kr` 도메인을 연결했습니다.
+- Resend 발신 도메인 `notify.gtskorea.co.kr` 인증과 Turnstile 설정을 완료했습니다.
+- 사용자가 홈페이지 견적 문의를 보내 `GTS@gtskorea.co.kr`에 실제 도착했음을 확인했습니다.
+- 문의 보관 기준은 **접수 후 1년 보관 후 삭제**입니다. 현재 메일함에서 직접 관리하며 자동 삭제 기능은 없습니다.
+- 로고와 전화번호는 추후 제공 예정입니다.
+- 제품·가공 사례 관리자는 `/admin/`에서 사용합니다. Access 로그인, D1 `CATALOG_DB`, R2 `CATALOG_IMAGES` 연결과 배포 후 점검은 [ADMIN_SETUP.md](ADMIN_SETUP.md)를 참고합니다. 환경 변수·바인딩 변경은 재배포 후 적용됩니다.
 
-설정 전에는 로컬 미리보기만 동작하며 접수 버튼은 비활성화됩니다. 아래 설정이 모두 완료되어야 개인정보 동의와 보안 확인이 표시됩니다. 보안 확인 후 미리보기 하단의 접수 버튼을 사용할 수 있습니다. 텍스트 파일 저장 기능은 제거했습니다. 수신자는 서버 코드에서 GTS@gtskorea.co.kr로 고정됩니다. 클라이언트 입력으로 수신 주소를 변경할 수 없습니다.
+아래 내용은 기존 견적 문의 설정을 유지·재설정할 때 참고하는 안내입니다. 관리자 설정 중에 정상 작동하는 문의 환경 변수나 이메일 DNS를 삭제하지 않습니다.
 
 ## 필요한 연결 정보
 
@@ -54,7 +59,7 @@ npx wrangler@4 pages dev dist
 계정 연결, 발신 인증, 변수 설정 후 **실제 배포 시에만** 다음을 실행합니다.
 
 ```powershell
-npx wrangler@4 pages deploy dist --project-name gts-korea
+npx wrangler@4 pages deploy dist --project-name gts-korea1
 ```
 
 프로젝트가 없으면 먼저 Pages 프로젝트를 생성합니다. Functions가 있으므로 대시보드에 정적 파일만 드래그해서 올리는 방식 대신 Wrangler 또는 Git 연동으로 배포합니다. Pages 프로젝트의 Custom domains에서 도메인을 추가한 후 Cloudflare에서 요구하는 웹사이트 DNS를 연결합니다.
@@ -66,7 +71,7 @@ npx wrangler@4 pages deploy dist --project-name gts-korea
 - API 키 미설정 시 접수 기능이 활성화되지 않는지 확인합니다.
 - 기존 회사 이메일 송수신을 재확인합니다.
 - 실패 후 재시도는 동일 작성 내용에 같은 접수번호를 사용해 중복 발송을 줄입니다. Resend의 idempotency 보장 기간을 넘어선 재시도까지 영구적으로 중복 방지하지는 않습니다.
-- 파일 업로드와 관리자 화면, 문의 데이터베이스는 이번 범위에 포함하지 않았습니다.
+- 제품 사진 업로드와 관리자 화면은 `ADMIN_SETUP.md`를 참고합니다. 견적 문의 데이터베이스는 별도로 만들지 않으며 문의는 이메일로 전달됩니다.
 
 ## 공식 문서
 
